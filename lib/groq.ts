@@ -1,12 +1,19 @@
 import Groq from 'groq-sdk';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+let groq: Groq | null = null;
+
+function getGroq() {
+  if (!groq) {
+    groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  }
+  return groq;
+}
 
 export async function getGroqResponse(
   messages: { role: 'system' | 'user' | 'assistant'; content: string }[],
   systemPrompt: string,
 ) {
-  const completion = await groq.chat.completions.create({
+  const completion = await getGroq().chat.completions.create({
     messages: [{ role: 'system', content: systemPrompt }, ...messages],
     model: 'qwen/qwen3-32b',
     temperature: 0.7,
